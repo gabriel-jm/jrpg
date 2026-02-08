@@ -8,6 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "lithen-fns": "^4.5.2"
+  },
   "devDependencies": {
     "typescript": "~5.9.3",
     "vite": "^7.2.4"

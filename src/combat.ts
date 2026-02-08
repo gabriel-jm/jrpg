@@ -143,6 +143,8 @@ export function combat() {
     combatLog.set(v => [...v, 'Warrior is defending'])
   }
 
+  queueMicrotask(() => runTurn())
+
   return html`
     <h1>Combat</h1>
     <ul>
@@ -156,7 +158,7 @@ export function combat() {
       })}
 
       ${shell(() => {
-        if (isPlayerTurn) {
+        if (isPlayerTurn.get()) {
           return html`
             <button on-click=${playerAction(playerAttack)}>
               Attack
