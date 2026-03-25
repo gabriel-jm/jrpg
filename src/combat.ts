@@ -6,14 +6,40 @@ type EnemyTarget = {
   hp: number
 }
 
+type CharacterAttrs = {
+  str: number
+  con: number
+  mag: number
+  agl: number
+}
+
+type CharacterSkillFn = (char: Character) => number 
+
+type Character = {
+  id: string
+  name: string
+  level: number
+  hp: number
+  attrs: CharacterAttrs
+  speed: number
+  skills: string[]
+  equip?: {
+    weapon?: {
+      attrs?: { str?: number }
+    },
+    armor?: {},
+    accessories: [{},{}]
+  }
+}
+
 export function createSkeleton() {
   return {
+    id: 'skeleton',
     name: 'Skeleton',
     level: 1,
     hp: 20,
     attrs: {
       str: 1,
-      dex: 1,
       con: 1,
       mag: 1,
       agl: 1
@@ -51,13 +77,23 @@ export function createSkeleton() {
   }
 }
 
+const skills: Record<string, CharacterSkillFn> = {
+  slash(char: Character) {
+    const skillPower = 0.8
+    const weaponBonus = char.equip?.weapon?.attrs?.str ?? 0
+    const attackPower = char.attrs.str + weaponBonus
+
+    return attackPower * skillPower
+  }
+}
+
 const warrior = {
   level: 1,
+  id: 'player',
   name: 'Warrior',
   hp: 20,
   attrs: {
     str: 1,
-    dex: 1,
     con: 1,
     mag: 1,
     agl: 3
@@ -81,6 +117,7 @@ export function combat() {
   let currentTurn = signal(0)
   const isPlayerTurn = signal(false)
   const combatLog = signal<string[]>([])
+  const enemiesNames = new Map<string, number>()
 
   const allies = [warrior]
   const combatList = [
@@ -91,6 +128,15 @@ export function combat() {
   ]
 
   combatList.forEach(c => {
+    const eName = enemiesNames.get(c.id)
+
+    if (!eName) {
+      enemiesNames.set(c.id, 1)
+    } else {
+      enemiesNames.set(c.id, eName + 1)
+      c.name += ` ${String.fromCharCode(64 + eName + 1)}`
+    }
+
     c.speed = c.attrs.agl + Math.round(Math.random() * 10)
   })
 
